@@ -20,7 +20,9 @@ import lt.luminor.payments.event.CountryLogEvent;
 import lt.luminor.payments.exceptions.CreditorBankRequiredException;
 import lt.luminor.payments.exceptions.DetailsRequiredException;
 import lt.luminor.payments.exceptions.InvalidCurrencyException;
+import lt.luminor.payments.exceptions.InvalidPaymentDateException;
 import lt.luminor.payments.exceptions.InvalidPaymentTypeException;
+import lt.luminor.payments.exceptions.PaymentClientException;
 import lt.luminor.payments.exceptions.PaymentNotFoundException;
 import lt.luminor.payments.form.PaymentFeeModel;
 import lt.luminor.payments.form.PaymentModel;
@@ -48,6 +50,19 @@ public class PaymentController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage(), e);
         }
         return new ResponseEntity<PaymentModel>(payment, HttpStatus.OK);
+    }
+
+    @GetMapping(path="/payments/{paymentId}/fee")
+    public ResponseEntity<PaymentFeeModel> getPaymentFee(@PathVariable("paymentId") final Long id)
+    {
+    	PaymentFeeModel payment;
+        try {
+        	payment = paymentService.getPaymentFee(id);
+        }
+        catch (PaymentNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage(), e);
+        }
+        return new ResponseEntity<PaymentFeeModel>(payment, HttpStatus.OK);
     }
 
     @GetMapping(path="/payments")
@@ -78,6 +93,12 @@ public class PaymentController {
         catch (PaymentNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage(), e);
         }
+        catch (PaymentClientException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getLocalizedMessage(), e);
+		}
+        catch (InvalidPaymentDateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, e.getLocalizedMessage(), e);
+		}
         return new ResponseEntity<PaymentFeeModel>(payment, HttpStatus.OK);
     }
 

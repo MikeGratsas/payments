@@ -44,7 +44,9 @@ public class CountryLogListener implements ApplicationListener<CountryLogEvent> 
     
 	@Override
 	public void onApplicationEvent(CountryLogEvent event) {
-		final CountryModel countryModel = findCountryByAddress(event.getAddress());
+		final String address = event.getAddress();
+		LOGGER.info("Resolving country from IP address: " + address);
+		final CountryModel countryModel = findCountryByAddress(address);
 		try {
 			geoLocationService.saveGeoLocation(countryModel);
 		}

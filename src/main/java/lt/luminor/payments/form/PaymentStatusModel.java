@@ -10,7 +10,7 @@ public class PaymentStatusModel {
 
     private Long id;
 
-    @NotBlank(message = "{paymentType.name.required}")
+    @NotBlank(message = "{paymentStatus.name.required}")
     private String name;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")

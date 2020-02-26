@@ -1,5 +1,7 @@
 package lt.luminor.payments.entity;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
@@ -16,8 +18,8 @@ public class Payment extends Auditable<Long> {
     @ManyToOne
     private Currency currency;
 
-    @Column(nullable = false)
-    private Double amount;
+    @Column(nullable = false, precision = 13, scale = 4)
+    private BigDecimal amount;
     
     @NotBlank
     @Column(name = "debtor_iban", nullable = false, length = 34)
@@ -32,7 +34,8 @@ public class Payment extends Auditable<Long> {
 
     private String details;
 
-    private Double fee;
+    @Column(precision = 13, scale = 4)
+    private BigDecimal fee;
 
     @ManyToOne
     private PaymentStatus paymentStatus;
@@ -64,11 +67,11 @@ public class Payment extends Auditable<Long> {
 		this.currency = currency;
 	}
 
-	public Double getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Double amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 
@@ -96,11 +99,11 @@ public class Payment extends Auditable<Long> {
 		this.creditorBic = creditorBic;
 	}
 
-	public Double getFee() {
+	public BigDecimal getFee() {
 		return fee;
 	}
 
-	public void setFee(Double fee) {
+	public void setFee(BigDecimal fee) {
 		this.fee = fee;
 	}
 

@@ -16,7 +16,7 @@ public class PaymentTypeModel {
     @NotBlank(message = "{paymentType.name.required}")
     private String name;
 
-    @PositiveOrZero(message = "{payment.amount.notnegative}")
+    @PositiveOrZero(message = "{paymentType.feeCoefficient.notnegative}")
     private Double feeCoefficient;
 
     private boolean detailsMandatory;

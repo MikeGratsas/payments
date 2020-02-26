@@ -1,5 +1,7 @@
 package lt.luminor.payments.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -9,8 +11,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
 
 import lt.luminor.payments.entity.Currency;
@@ -21,7 +25,9 @@ import lt.luminor.payments.event.PaymentSaveEvent;
 import lt.luminor.payments.exceptions.CreditorBankRequiredException;
 import lt.luminor.payments.exceptions.DetailsRequiredException;
 import lt.luminor.payments.exceptions.InvalidCurrencyException;
+import lt.luminor.payments.exceptions.InvalidPaymentDateException;
 import lt.luminor.payments.exceptions.InvalidPaymentTypeException;
+import lt.luminor.payments.exceptions.PaymentClientException;
 import lt.luminor.payments.exceptions.PaymentNotFoundException;
 import lt.luminor.payments.form.PaymentFeeModel;
 import lt.luminor.payments.form.PaymentModel;
@@ -41,6 +47,8 @@ public class PaymentService {
     private PaymentTypeRepository paymentTypeRepository;
     @Autowired
     private PaymentStatusRepository paymentStatusRepository;
+    @Autowired
+    private AuditorAware<Long> auditorAware;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
@@ -70,7 +78,7 @@ public class PaymentService {
         if (currencyOptional.isPresent()) {
 			Optional<PaymentStatus> paymentStatusOptional = paymentStatusRepository.findById(paymentStatusId);
 			if (paymentStatusOptional.isPresent()) {
-				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountLessThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), amount, pageable);
+				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountLessThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), BigDecimal.valueOf(amount), pageable);
 				return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
 			} 
 		}
@@ -82,7 +90,7 @@ public class PaymentService {
         if (currencyOptional.isPresent()) {
 			Optional<PaymentStatus> paymentStatusOptional = paymentStatusRepository.findById(paymentStatusId);
 			if (paymentStatusOptional.isPresent()) {
-				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountGreaterThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), amount, pageable);
+				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountGreaterThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), BigDecimal.valueOf(amount), pageable);
 				return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
 			} 
 		}
@@ -101,9 +109,17 @@ public class PaymentService {
         return paymentModel;
 	}
 
+    public PaymentFeeModel getPaymentFee(Long id) throws PaymentNotFoundException {
+        Optional<Payment> paymentEntityOptional = paymentRepository.findById(id);
+        if (!paymentEntityOptional.isPresent())
+            throw new PaymentNotFoundException(id);
+    	Payment paymentEntity = paymentEntityOptional.get();
+        return new PaymentFeeModel(paymentEntity.getId(), paymentEntity.getFee().doubleValue());
+	}
+
     public PaymentModel createPayment(PaymentModel paymentModel) throws DetailsRequiredException, CreditorBankRequiredException, InvalidCurrencyException, InvalidPaymentTypeException {
         Payment paymentEntity = new Payment();
-        paymentEntity.setAmount(paymentModel.getAmount());
+        paymentEntity.setAmount(BigDecimal.valueOf(paymentModel.getAmount()));
         paymentEntity.setDebtorIban(paymentModel.getDebtorIban());
         paymentEntity.setCreditorIban(paymentModel.getCreditorIban());
     	Currency currencyEntity = currencyRepository.findByCode(paymentModel.getCurrency()).orElse(null);
@@ -137,22 +153,31 @@ public class PaymentService {
         return payment;
     }
     
-    public PaymentFeeModel cancelPayment(Long id) throws PaymentNotFoundException {
+    public PaymentFeeModel cancelPayment(Long id) throws PaymentNotFoundException, PaymentClientException, InvalidPaymentDateException {
+    	Optional<Long> currentClient = auditorAware.getCurrentAuditor();
+    	if (!currentClient.isPresent())
+    		throw new AuthenticationCredentialsNotFoundException("An Authentication object was not found in the SecurityContext");
     	Optional<Payment> paymentOptional = paymentRepository.findById(id);
     	if (!paymentOptional.isPresent())
     		throw new PaymentNotFoundException(id);
     	Payment paymentEntity = paymentOptional.get();
+    	if (!currentClient.get().equals(paymentEntity.getCreatedBy()))
+    		throw new PaymentClientException(id);
+		final LocalDateTime now = LocalDateTime.now();
+    	final LocalDateTime created = paymentEntity.getCreated();
+    	final LocalDate creationDate = created.toLocalDate();
+		if (!now.toLocalDate().isEqual(creationDate))
+    		throw new InvalidPaymentDateException(creationDate);
     	PaymentType paymentTypeEntity = paymentEntity.getPaymentType();
     	if (paymentTypeEntity != null) {
-        	LocalDateTime created = paymentEntity.getCreated();
-    		long hours = ChronoUnit.HOURS.between(created, LocalDateTime.now());
-    		paymentEntity.setFee(paymentTypeEntity.getFeeCoefficient().doubleValue() * hours);
+			long hours = ChronoUnit.HOURS.between(created, now);
+    		paymentEntity.setFee(BigDecimal.valueOf(paymentTypeEntity.getFeeCoefficient().doubleValue()).multiply(BigDecimal.valueOf(hours)));
     	}
         Optional<PaymentStatus> paymentStatusOptional = paymentStatusRepository.findById(2L);
         if (paymentStatusOptional.isPresent())
         	paymentEntity.setPaymentStatus(paymentStatusOptional.get());
         paymentRepository.save(paymentEntity);
-        return new PaymentFeeModel(paymentEntity.getId(), paymentEntity.getFee());
+        return new PaymentFeeModel(paymentEntity.getId(), paymentEntity.getFee().doubleValue());
     }
     
     public void deletePayments(Long[] ids) {
@@ -172,6 +197,6 @@ public class PaymentService {
         if (t != null) {
         	paymentType = t.getName();
         }
-        return new PaymentModel(paymentEntity.getId(), paymentType, currency, paymentEntity.getAmount(), paymentEntity.getDebtorIban(), paymentEntity.getCreditorIban(), paymentEntity.getCreditorBic(), paymentEntity.getDetails(), paymentEntity.getCreated(), paymentEntity.getLastUpdated());
+        return new PaymentModel(paymentEntity.getId(), paymentType, currency, paymentEntity.getAmount().doubleValue(), paymentEntity.getDebtorIban(), paymentEntity.getCreditorIban(), paymentEntity.getCreditorBic(), paymentEntity.getDetails(), paymentEntity.getCreated(), paymentEntity.getLastUpdated());
     }
 }

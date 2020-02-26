@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -75,7 +76,23 @@ public class PaymentControllerTest {
 
         ResponseEntity<PaymentFeeModel> resultFeeAsset = template.withBasicAuth(username, password).getForEntity("/api/payments/{paymentId}/cancel", PaymentFeeModel.class, payment2Id);
         Assertions.assertEquals(HttpStatus.OK, resultFeeAsset.getStatusCode());
-        Assertions.assertEquals(payment2Id, resultFeeAsset.getBody().getId());
+        PaymentFeeModel paymentFee = resultFeeAsset.getBody();
+		Assertions.assertEquals(payment2Id, paymentFee.getId());
+		Assertions.assertNotNull(paymentFee.getFee());
+
+        resultFeeAsset = template.withBasicAuth(username, password).getForEntity("/api/payments/{paymentId}/fee", PaymentFeeModel.class, payment2Id);
+        Assertions.assertEquals(HttpStatus.OK, resultFeeAsset.getStatusCode());
+        paymentFee = resultFeeAsset.getBody();
+		Assertions.assertEquals(payment2Id, paymentFee.getId());
+		Assertions.assertNotNull(paymentFee.getFee());
+		
+        ResponseEntity<PaymentModel[]> resultList = template.withBasicAuth(username, password).getForEntity("/api/payments", PaymentModel[].class);
+        Assertions.assertEquals(HttpStatus.OK, resultList.getStatusCode());
+        Assertions.assertTrue(resultList.getBody().length > 0);
+
+        resultList = template.withBasicAuth(username, password).getForEntity("/api/payments/lessThanAmount?currency=USD&amp;amount=250", PaymentModel[].class);
+        Assertions.assertEquals(HttpStatus.OK, resultList.getStatusCode());
+        Assertions.assertTrue(resultList.getBody().length > 0);
 	}
 
     private HttpEntity<Object> getHttpEntity(Object body, MultiValueMap<String, String> headerMap)

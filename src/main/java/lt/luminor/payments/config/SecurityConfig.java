@@ -47,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/**", "/api/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
+                /*
                 .formLogin()
                 .loginPage("/login").permitAll()
                 .and()
@@ -56,6 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/logout")
                 .permitAll()
                 .and()
+                */
                 .httpBasic();
     }
 
