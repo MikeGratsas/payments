@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -90,7 +89,7 @@ public class PaymentControllerTest {
         Assertions.assertEquals(HttpStatus.OK, resultList.getStatusCode());
         Assertions.assertTrue(resultList.getBody().length > 0);
 
-        resultList = template.withBasicAuth(username, password).getForEntity("/api/payments/lessThanAmount?currency=USD&amp;amount=250", PaymentModel[].class);
+        resultList = template.withBasicAuth(username, password).getForEntity("/api/payments/filter/lessThanAmount?currency=USD&amount=250", PaymentModel[].class);
         Assertions.assertEquals(HttpStatus.OK, resultList.getStatusCode());
         Assertions.assertTrue(resultList.getBody().length > 0);
 	}

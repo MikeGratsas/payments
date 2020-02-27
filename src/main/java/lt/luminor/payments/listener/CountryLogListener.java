@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import lt.luminor.payments.event.CountryLogEvent;
@@ -16,6 +18,7 @@ import lt.luminor.payments.form.CountryModel;
 import lt.luminor.payments.service.CountryService;
 import lt.luminor.payments.service.GeoLocationService;
 
+@Component
 public class CountryLogListener implements ApplicationListener<CountryLogEvent> {
 	private final static Logger LOGGER = Logger.getLogger(CountryLogListener.class.getName()); 
 	
@@ -27,17 +30,22 @@ public class CountryLogListener implements ApplicationListener<CountryLogEvent> 
 
     private CountryModel findCountryByAddress(String address) {
     	CountryModel countryModel = null;
-		RestTemplate template = new RestTemplate();
-		ResponseEntity<String> resultAsset = template.getForEntity("https://ipinfo.io/" + address + "/country", String.class);
-		if (resultAsset.getStatusCode() == HttpStatus.OK) {
-			String countryCode = resultAsset.getBody();
-			if (countryCode != null) {
-				countryModel = countryService.findByCode(countryCode);
-				if (countryModel == null) {
-					Locale locale = new Locale("en", countryCode);
-					countryModel = countryService.createCountry(new CountryModel(locale.getCountry(), locale.getDisplayCountry()));
-				} 
+		final RestTemplate template = new RestTemplate();
+		try {
+			ResponseEntity<String> resultAsset = template.getForEntity("https://ipinfo.io/" + address + "/country", String.class);
+			if (resultAsset.getStatusCode() == HttpStatus.OK) {
+				final String countryCode = resultAsset.getBody();
+				if (countryCode != null) {
+					countryModel = countryService.findByCode(countryCode);
+					if (countryModel == null) {
+						final Locale locale = new Locale("en", countryCode);
+						countryModel = countryService.createCountry(new CountryModel(locale.getCountry(), locale.getDisplayCountry()));
+					} 
+				}
 			}
+		}
+		catch (RestClientException e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
 		}
 		return countryModel;		
 	}

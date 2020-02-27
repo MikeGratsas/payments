@@ -5,12 +5,14 @@ import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
 import lt.luminor.payments.event.PaymentSaveEvent;
 import lt.luminor.payments.exceptions.PaymentNotFoundException;
 import lt.luminor.payments.form.PaymentModel;
 import lt.luminor.payments.service.NotificationService;
 
+@Component
 public class PaymentSaveListener implements ApplicationListener<PaymentSaveEvent> {
 	private final static Logger LOGGER = Logger.getLogger(PaymentSaveListener.class.getName()); 
 	
