@@ -2,7 +2,6 @@ package lt.luminor.payments.service;
 
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import lt.luminor.payments.entity.Notification;
@@ -20,7 +19,7 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    public Integer sendNotification(PaymentModel paymentModel) throws PaymentNotFoundException {
+    public Integer saveNotification(int result, PaymentModel paymentModel) throws PaymentNotFoundException {
     	final Long id = paymentModel.getId();
 		Optional<Payment> paymentOptional = paymentRepository.findById(id);
     	if (!paymentOptional.isPresent())
@@ -28,7 +27,7 @@ public class NotificationService {
     	Payment paymentEntity = paymentOptional.get();
         Notification notificationEntity = new Notification();
         notificationEntity.setPayment(paymentEntity);
-        notificationEntity.setStatus(HttpStatus.CREATED.value());
+        notificationEntity.setStatus(result);
         Notification c = notificationRepository.save(notificationEntity);
         return c.getStatus();
     }

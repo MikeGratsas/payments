@@ -1,5 +1,6 @@
 package lt.luminor.payments.form;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import javax.validation.constraints.*;
@@ -14,13 +15,14 @@ public class PaymentModel {
     @NotBlank(message = "{payment.currency.required}")
     private String currency;
     @Positive(message = "{payment.amount.positive}")
-    private Double amount;
+    private BigDecimal amount;
     @NotBlank(message = "{payment.debtorIban.required}")
     private String debtorIban;
     @NotBlank(message = "{payment.creditorIban.required}")
     private String creditorIban;
     private String creditorBic;
     private String details;
+    private Long createdBy;
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime created;
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
@@ -29,8 +31,8 @@ public class PaymentModel {
     public PaymentModel() {
 	}
     
-	public PaymentModel(Long id, String paymentType, String currency, Double amount, String debtorIban, String creditorIban, String creditorBic,
-			String details, LocalDateTime created, LocalDateTime lastUpdated) {
+	public PaymentModel(Long id, String paymentType, String currency, BigDecimal amount, String debtorIban, String creditorIban, String creditorBic,
+			String details, Long createdBy, LocalDateTime created, LocalDateTime lastUpdated) {
 		this.id = id;
 		this.paymentType = paymentType;
 		this.currency = currency;
@@ -39,6 +41,7 @@ public class PaymentModel {
 		this.creditorIban = creditorIban;
 		this.creditorBic = creditorBic;
 		this.details = details;
+		this.createdBy = createdBy;
 		this.created = created;
 		this.lastUpdated = lastUpdated;
 	}
@@ -67,11 +70,11 @@ public class PaymentModel {
 		this.currency = currency;
 	}
 
-	public Double getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Double amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 
@@ -121,6 +124,61 @@ public class PaymentModel {
 
 	public void setLastUpdated(LocalDateTime lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+
+	public Long getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(Long createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PaymentModel [");
+		if (id != null) {
+			builder.append("id=");
+			builder.append(id);
+			builder.append(", ");
+		}
+		if (paymentType != null) {
+			builder.append("paymentType=");
+			builder.append(paymentType);
+			builder.append(", ");
+		}
+		if (currency != null) {
+			builder.append("currency=");
+			builder.append(currency);
+			builder.append(", ");
+		}
+		if (amount != null) {
+			builder.append("amount=");
+			builder.append(amount);
+			builder.append(", ");
+		}
+		if (debtorIban != null) {
+			builder.append("debtorIban=");
+			builder.append(debtorIban);
+			builder.append(", ");
+		}
+		if (creditorIban != null) {
+			builder.append("creditorIban=");
+			builder.append(creditorIban);
+			builder.append(", ");
+		}
+		if (creditorBic != null) {
+			builder.append("creditorBic=");
+			builder.append(creditorBic);
+			builder.append(", ");
+		}
+		if (details != null) {
+			builder.append("details=");
+			builder.append(details);
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

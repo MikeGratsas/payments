@@ -1,14 +1,16 @@
 package lt.luminor.payments.form;
 
+import java.math.BigDecimal;
+
 public class PaymentFeeModel {
 
 	private Long id;
-    private Double fee;
+    private BigDecimal fee;
     
     public PaymentFeeModel() {
 	}
     
-	public PaymentFeeModel(Long id, Double fee) {
+	public PaymentFeeModel(Long id, BigDecimal fee) {
 		this.id = id;
 		this.fee = fee;
 	}
@@ -21,11 +23,11 @@ public class PaymentFeeModel {
 		this.id = id;
 	}
 
-	public Double getFee() {
+	public BigDecimal getFee() {
 		return fee;
 	}
 
-	public void setFee(Double fee) {
+	public void setFee(BigDecimal fee) {
 		this.fee = fee;
 	}
 

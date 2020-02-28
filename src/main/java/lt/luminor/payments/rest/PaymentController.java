@@ -1,5 +1,6 @@
 package lt.luminor.payments.rest;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -72,13 +73,13 @@ public class PaymentController {
     }
 
     @GetMapping(path="/payments/filter/lessThanAmount")
-    public ResponseEntity<List<PaymentModel>> listPaymentsLessThanAmount(@RequestParam final String currency, @RequestParam final Double amount, final Pageable pageable)
+    public ResponseEntity<List<PaymentModel>> listPaymentsLessThanAmount(@RequestParam final String currency, @RequestParam final BigDecimal amount, final Pageable pageable)
     {
         return new ResponseEntity<List<PaymentModel>>(paymentService.listPaymentsLessThanAmount(getCurrentClientId(), currency, amount, 1L, pageable), HttpStatus.OK);
     }
 
     @GetMapping(path="/payments/filter/greaterThanAmount")
-    public ResponseEntity<List<PaymentModel>> listPaymentsGreaterThanAmount(@RequestParam final String currency, @RequestParam final Double amount, final Pageable pageable)
+    public ResponseEntity<List<PaymentModel>> listPaymentsGreaterThanAmount(@RequestParam final String currency, @RequestParam final BigDecimal amount, final Pageable pageable)
     {
         return new ResponseEntity<List<PaymentModel>>(paymentService.listPaymentsGreaterThanAmount(getCurrentClientId(), currency, amount, 1L, pageable), HttpStatus.OK);
     }

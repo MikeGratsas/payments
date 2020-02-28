@@ -73,24 +73,24 @@ public class PaymentService {
 		return null;
 	}
 
-    public List<PaymentModel> listPaymentsLessThanAmount(final Long clientId, final String currency, final Double amount, final Long paymentStatusId, final Pageable pageable) {
+    public List<PaymentModel> listPaymentsLessThanAmount(final Long clientId, final String currency, final BigDecimal amount, final Long paymentStatusId, final Pageable pageable) {
         Optional<Currency> currencyOptional = currencyRepository.findByCode(currency);
         if (currencyOptional.isPresent()) {
 			Optional<PaymentStatus> paymentStatusOptional = paymentStatusRepository.findById(paymentStatusId);
 			if (paymentStatusOptional.isPresent()) {
-				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountLessThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), BigDecimal.valueOf(amount), pageable);
+				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountLessThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), amount, pageable);
 				return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
 			} 
 		}
 		return null;
 	}
 
-    public List<PaymentModel> listPaymentsGreaterThanAmount(final Long clientId, final String currency, final Double amount, final Long paymentStatusId, final Pageable pageable) {
+    public List<PaymentModel> listPaymentsGreaterThanAmount(final Long clientId, final String currency, final BigDecimal amount, final Long paymentStatusId, final Pageable pageable) {
         Optional<Currency> currencyOptional = currencyRepository.findByCode(currency);
         if (currencyOptional.isPresent()) {
 			Optional<PaymentStatus> paymentStatusOptional = paymentStatusRepository.findById(paymentStatusId);
 			if (paymentStatusOptional.isPresent()) {
-				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountGreaterThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), BigDecimal.valueOf(amount), pageable);
+				Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndCurrencyAndPaymentStatusAndAmountGreaterThanOrderByAmount(clientId, currencyOptional.get(), paymentStatusOptional.get(), amount, pageable);
 				return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
 			} 
 		}
@@ -114,12 +114,12 @@ public class PaymentService {
         if (!paymentEntityOptional.isPresent())
             throw new PaymentNotFoundException(id);
     	Payment paymentEntity = paymentEntityOptional.get();
-        return new PaymentFeeModel(paymentEntity.getId(), paymentEntity.getFee().doubleValue());
+        return new PaymentFeeModel(paymentEntity.getId(), paymentEntity.getFee());
 	}
 
     public PaymentModel createPayment(PaymentModel paymentModel) throws DetailsRequiredException, CreditorBankRequiredException, InvalidCurrencyException, InvalidPaymentTypeException {
         Payment paymentEntity = new Payment();
-        paymentEntity.setAmount(BigDecimal.valueOf(paymentModel.getAmount()));
+        paymentEntity.setAmount(paymentModel.getAmount());
         paymentEntity.setDebtorIban(paymentModel.getDebtorIban());
         paymentEntity.setCreditorIban(paymentModel.getCreditorIban());
     	Currency currencyEntity = currencyRepository.findByCode(paymentModel.getCurrency()).orElse(null);
@@ -177,7 +177,7 @@ public class PaymentService {
         if (paymentStatusOptional.isPresent())
         	paymentEntity.setPaymentStatus(paymentStatusOptional.get());
         paymentRepository.save(paymentEntity);
-        return new PaymentFeeModel(paymentEntity.getId(), paymentEntity.getFee().doubleValue());
+        return new PaymentFeeModel(paymentEntity.getId(), paymentEntity.getFee());
     }
     
     public void deletePayments(Long[] ids) {
@@ -197,6 +197,6 @@ public class PaymentService {
         if (t != null) {
         	paymentType = t.getName();
         }
-        return new PaymentModel(paymentEntity.getId(), paymentType, currency, paymentEntity.getAmount().doubleValue(), paymentEntity.getDebtorIban(), paymentEntity.getCreditorIban(), paymentEntity.getCreditorBic(), paymentEntity.getDetails(), paymentEntity.getCreated(), paymentEntity.getLastUpdated());
+        return new PaymentModel(paymentEntity.getId(), paymentType, currency, paymentEntity.getAmount(), paymentEntity.getDebtorIban(), paymentEntity.getCreditorIban(), paymentEntity.getCreditorBic(), paymentEntity.getDetails(), paymentEntity.getCreatedBy(), paymentEntity.getCreated(), paymentEntity.getLastUpdated());
     }
 }
