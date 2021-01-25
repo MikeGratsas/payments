@@ -23,6 +23,13 @@ jobs:
     - name: Build with Maven
       run: mvn clean install
 
+    - name: Cache the Maven packages to speed up build
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2      
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
