@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy WAR app to Azure Web App - payments-mg
+name: Build and deploy JAR app to Azure Web App - payments-mg
 
 on:
   push:
@@ -29,4 +29,4 @@ jobs:
         app-name: 'payments-mg'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_27fdeef5e453441f8746fbf0c59e9692 }}
-        package: '${{ github.workspace }}/target/*.war'
+        package: '${{ github.workspace }}/target/*.jar'
