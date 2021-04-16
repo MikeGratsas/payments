@@ -10,7 +10,6 @@ on:
   pull_request:
       types: [opened, synchronize, reopened]
 
-name: Main Workflow
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
