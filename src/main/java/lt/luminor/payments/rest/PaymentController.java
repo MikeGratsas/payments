@@ -50,7 +50,7 @@ public class PaymentController {
         catch (PaymentNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage(), e);
         }
-        return new ResponseEntity<PaymentModel>(payment, HttpStatus.OK);
+        return ResponseEntity.ok(payment);
     }
 
     @GetMapping(path="/payments/{paymentId}/fee")
@@ -63,25 +63,25 @@ public class PaymentController {
         catch (PaymentNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage(), e);
         }
-        return new ResponseEntity<PaymentFeeModel>(payment, HttpStatus.OK);
+        return ResponseEntity.ok(payment);
     }
 
     @GetMapping(path="/payments")
     public ResponseEntity<List<PaymentModel>> listPayments(final Pageable pageable)
     {
-        return new ResponseEntity<List<PaymentModel>>(paymentService.listPayments(getCurrentClientId(), 1L, pageable), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.listPayments(getCurrentClientId(), 1L, pageable));
     }
 
     @GetMapping(path="/payments/filter/lessThanAmount")
     public ResponseEntity<List<PaymentModel>> listPaymentsLessThanAmount(@RequestParam final String currency, @RequestParam final BigDecimal amount, final Pageable pageable)
     {
-        return new ResponseEntity<List<PaymentModel>>(paymentService.listPaymentsLessThanAmount(getCurrentClientId(), currency, amount, 1L, pageable), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.listPaymentsLessThanAmount(getCurrentClientId(), currency, amount, 1L, pageable));
     }
 
     @GetMapping(path="/payments/filter/greaterThanAmount")
     public ResponseEntity<List<PaymentModel>> listPaymentsGreaterThanAmount(@RequestParam final String currency, @RequestParam final BigDecimal amount, final Pageable pageable)
     {
-        return new ResponseEntity<List<PaymentModel>>(paymentService.listPaymentsGreaterThanAmount(getCurrentClientId(), currency, amount, 1L, pageable), HttpStatus.OK);
+        return ResponseEntity.ok(paymentService.listPaymentsGreaterThanAmount(getCurrentClientId(), currency, amount, 1L, pageable));
     }
 
     @GetMapping(path="/payments/{paymentId}/cancel")
@@ -100,7 +100,7 @@ public class PaymentController {
         catch (InvalidPaymentDateException e) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, e.getLocalizedMessage(), e);
 		}
-        return new ResponseEntity<PaymentFeeModel>(payment, HttpStatus.OK);
+        return ResponseEntity.ok(payment);
     }
 
     @PostMapping("/payments")
@@ -124,7 +124,7 @@ public class PaymentController {
         catch (InvalidPaymentTypeException e) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, e.getLocalizedMessage(), e);
 		}
-        return new ResponseEntity<PaymentModel>(paymentModel, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentModel);
     }
 
 	private Long getCurrentClientId() {
