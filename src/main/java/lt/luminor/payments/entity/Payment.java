@@ -41,6 +41,7 @@ public class Payment extends Auditable<Long> {
     private PaymentStatus paymentStatus;
     
     public Payment() {
+    	// Required by JPA
     }
 
     public Long getId() {

@@ -15,7 +15,7 @@ public class RegistrationModel {
     private String username;
     @NotBlank(message = "{user.password.required}")
     @Size(min = 1, max = 60, message = "{user.password.size}")
-    @Pattern(regexp="^[a-zA-Z0-9.-_]*$", message = "{user.password.chars}")
+    @Pattern(regexp="^[a-zA-Z0-9.\\-_]*$", message = "{user.password.chars}")
     private String password;
     @Email
     @Size(min = 1, max = 320, message = "{user.email.size}")

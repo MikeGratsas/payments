@@ -13,6 +13,7 @@ public class GeoLocation extends Auditable<Long> {
     private Country country;
 
     public GeoLocation() {
+    	// Required by JPA
     }
 
     public Long getId() {

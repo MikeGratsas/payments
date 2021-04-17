@@ -20,7 +20,7 @@ import lt.luminor.payments.service.GeoLocationService;
 
 @Component
 public class CountryLogListener implements ApplicationListener<CountryLogEvent> {
-	private final static Logger LOGGER = Logger.getLogger(CountryLogListener.class.getName()); 
+	private static final Logger LOGGER = Logger.getLogger(CountryLogListener.class.getName()); 
 	
     @Autowired
     private GeoLocationService geoLocationService;
@@ -53,7 +53,7 @@ public class CountryLogListener implements ApplicationListener<CountryLogEvent> 
 	@Override
 	public void onApplicationEvent(CountryLogEvent event) {
 		final String address = event.getAddress();
-		LOGGER.info("Resolving country from IP address: " + address);
+		LOGGER.log(Level.INFO, "Resolving country from IP address: {0}", address);
 		final CountryModel countryModel = findCountryByAddress(address);
 		try {
 			geoLocationService.saveGeoLocation(countryModel);

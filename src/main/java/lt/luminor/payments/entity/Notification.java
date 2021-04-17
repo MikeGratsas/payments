@@ -25,6 +25,7 @@ public class Notification {
     private LocalDateTime lastUpdated;
 
     public Notification() {
+    	// Required by JPA
     }
 
     public Long getId() {

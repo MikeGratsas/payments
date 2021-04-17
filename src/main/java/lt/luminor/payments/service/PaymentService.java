@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class PaymentService {
             Page<Payment> paymentEnties = paymentRepository.findByCreatedByAndPaymentStatusOrderByPaymentType(clientId, paymentStatusOptional.get(), pageable);
             return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
 	}
 
     public List<PaymentModel> listPaymentsOrderByAmount(final Long clientId, final String currency, final Long paymentStatusId, final Pageable pageable) {
@@ -70,7 +71,7 @@ public class PaymentService {
 				return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
 			} 
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
     public List<PaymentModel> listPaymentsLessThanAmount(final Long clientId, final String currency, final BigDecimal amount, final Long paymentStatusId, final Pageable pageable) {
@@ -82,7 +83,7 @@ public class PaymentService {
 				return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
 			} 
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
     public List<PaymentModel> listPaymentsGreaterThanAmount(final Long clientId, final String currency, final BigDecimal amount, final Long paymentStatusId, final Pageable pageable) {
@@ -94,7 +95,7 @@ public class PaymentService {
 				return paymentEnties.stream().map(PaymentService::assemblePaymentModel).collect(Collectors.toList());
 			} 
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
     public PaymentModel findPayment(Long id) throws PaymentNotFoundException {
@@ -124,7 +125,7 @@ public class PaymentService {
         paymentEntity.setCreditorIban(paymentModel.getCreditorIban());
     	Currency currencyEntity = currencyRepository.findByCode(paymentModel.getCurrency()).orElse(null);
     	Optional<PaymentType> paymentTypeOptional = paymentTypeRepository.findByName(paymentModel.getPaymentType());
-        if (!paymentTypeOptional.isPresent())
+		if (!paymentTypeOptional.isPresent())
 			throw new InvalidPaymentTypeException(paymentModel.getPaymentType());
     	PaymentType paymentTypeEntity = paymentTypeOptional.get();
 		String details = paymentModel.getDetails();

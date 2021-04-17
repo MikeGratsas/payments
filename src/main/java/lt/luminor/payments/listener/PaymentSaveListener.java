@@ -24,7 +24,7 @@ import lt.luminor.payments.service.NotificationService;
 @Component
 @PropertySource("classpath:custom.properties")
 public class PaymentSaveListener implements ApplicationListener<PaymentSaveEvent> {
-	private final static Logger LOGGER = Logger.getLogger(PaymentSaveListener.class.getName()); 
+	private static final Logger LOGGER = Logger.getLogger(PaymentSaveListener.class.getName()); 
 	
 	@Autowired
     private Environment environment;

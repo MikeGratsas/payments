@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,7 @@ import lt.luminor.payments.form.MessageModel;
 
 @Service
 public class MailServiceImpl implements MailService {
-    private final static Logger LOGGER = Logger.getLogger(MailServiceImpl.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MailServiceImpl.class.getName());
 
     @Value("${spring.mail.username}")
     private String username;
@@ -48,7 +47,7 @@ public class MailServiceImpl implements MailService {
 	        final HttpHeaders headers = new HttpHeaders();
 	        headers.setBasicAuth(username, password);
 	        headers.setContentType(MediaType.APPLICATION_JSON);
-	    	HttpEntity<String> request = new HttpEntity<String>(messagesJsonObject.toString(), headers);
+	    	HttpEntity<String> request = new HttpEntity<>(messagesJsonObject.toString(), headers);
 			final RestTemplate template = new RestTemplate();
 	    	ResponseEntity<String> response = template.postForEntity("https://api.mailjet.com/v3.1/send", request, String.class);
 	    	result = response.getStatusCodeValue();

@@ -9,7 +9,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class RequestUtil {
 
-    private static final String[] IP_HEADER_NAMES = { 
+	private static final String[] IP_HEADER_NAMES = { 
                                                         "X-Forwarded-For",
                                                         "Proxy-Client-IP",
                                                         "WL-Proxy-Client-IP",
@@ -22,6 +22,9 @@ public class RequestUtil {
                                                         "HTTP_VIA",
                                                         "REMOTE_ADDR"
                                                     };
+
+    private RequestUtil() {
+	}
 
     public static String getRemoteIP(RequestAttributes requestAttributes)
     {

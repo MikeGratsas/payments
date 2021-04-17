@@ -22,28 +22,28 @@ import lt.luminor.payments.form.PaymentModel;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PaymentControllerTest {
+class PaymentControllerTest {
 
     @Autowired
     private TestRestTemplate template;
 
-    private final String username = "tester";
-    private final String password = "secret";
+    private static final String USERNAME = "tester";
+    private static final String PASSWORD = "secret";
     MultiValueMap<String, String> headerMap = new LinkedMultiValueMap<>();
 
     @BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
     	Assertions.assertNotNull(template);
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	public void tearDown() {
 	}
 
 	@Test
 	public void test() {
         HttpEntity<Object> payment1Entity = getHttpEntity("{\"paymentType\": \"TYPE1\", \"currency\": \"EUR\", \"amount\": 50.15, \"debtorIban\": \"LT123456789\", \"creditorIban\": \"LT123456780\", \"details\": \"TYPE1 payment\" }", headerMap);
-        ResponseEntity<PaymentModel> resultAsset = template.withBasicAuth(username, password).postForEntity("/api/payments", payment1Entity, PaymentModel.class);
+        ResponseEntity<PaymentModel> resultAsset = template.withBasicAuth(USERNAME, PASSWORD).postForEntity("/api/payments", payment1Entity, PaymentModel.class);
         Assertions.assertEquals(HttpStatus.CREATED, resultAsset.getStatusCode());
         PaymentModel payment1 = resultAsset.getBody();
         Assertions.assertNotNull(payment1);
@@ -51,12 +51,14 @@ public class PaymentControllerTest {
         Assertions.assertNotNull(payment1Id);
         Assertions.assertNotNull(payment1.getLastUpdated());
 
-        resultAsset = template.withBasicAuth(username, password).getForEntity("/api/payments/{paymentId}", PaymentModel.class, payment1Id);
+        resultAsset = template.withBasicAuth(USERNAME, PASSWORD).getForEntity("/api/payments/{paymentId}", PaymentModel.class, payment1Id);
         Assertions.assertEquals(HttpStatus.OK, resultAsset.getStatusCode());
-        Assertions.assertEquals(payment1Id, resultAsset.getBody().getId());
+        PaymentModel payment = resultAsset.getBody();
+        Assertions.assertNotNull(payment);
+        Assertions.assertEquals(payment1Id, payment.getId());
 
         HttpEntity<Object> payment2Entity = getHttpEntity("{\"paymentType\": \"TYPE2\", \"currency\": \"USD\", \"amount\": 500.45, \"debtorIban\": \"LT023456789\", \"creditorIban\": \"LT023456780\", \"details\": \"TYPE2 payment\" }", headerMap);
-        resultAsset = template.withBasicAuth(username, password).postForEntity("/api/payments", payment2Entity, PaymentModel.class);
+        resultAsset = template.withBasicAuth(USERNAME, PASSWORD).postForEntity("/api/payments", payment2Entity, PaymentModel.class);
         Assertions.assertEquals(HttpStatus.CREATED, resultAsset.getStatusCode());
         PaymentModel payment2 = resultAsset.getBody();
         Assertions.assertNotNull(payment2);
@@ -65,7 +67,7 @@ public class PaymentControllerTest {
         Assertions.assertNotNull(payment2.getLastUpdated());
         
         HttpEntity<Object> payment3Entity = getHttpEntity("{\"paymentType\": \"TYPE3\", \"currency\": \"USD\", \"amount\": 200.65, \"debtorIban\": \"LT023456789\", \"creditorIban\": \"LT023456784\", \"creditorBic\": \"NDEAFIHH\" }", headerMap);
-        resultAsset = template.withBasicAuth(username, password).postForEntity("/api/payments", payment3Entity, PaymentModel.class);
+        resultAsset = template.withBasicAuth(USERNAME, PASSWORD).postForEntity("/api/payments", payment3Entity, PaymentModel.class);
         Assertions.assertEquals(HttpStatus.CREATED, resultAsset.getStatusCode());
         PaymentModel payment3 = resultAsset.getBody();
         Assertions.assertNotNull(payment3);
@@ -73,31 +75,37 @@ public class PaymentControllerTest {
         Assertions.assertNotNull(payment3Id);
         Assertions.assertNotNull(payment3.getLastUpdated());
 
-        ResponseEntity<PaymentFeeModel> resultFeeAsset = template.withBasicAuth(username, password).getForEntity("/api/payments/{paymentId}/cancel", PaymentFeeModel.class, payment2Id);
+        ResponseEntity<PaymentFeeModel> resultFeeAsset = template.withBasicAuth(USERNAME, PASSWORD).getForEntity("/api/payments/{paymentId}/cancel", PaymentFeeModel.class, payment2Id);
         Assertions.assertEquals(HttpStatus.OK, resultFeeAsset.getStatusCode());
         PaymentFeeModel paymentFee = resultFeeAsset.getBody();
+        Assertions.assertNotNull(paymentFee);
 		Assertions.assertEquals(payment2Id, paymentFee.getId());
 		Assertions.assertNotNull(paymentFee.getFee());
 
-        resultFeeAsset = template.withBasicAuth(username, password).getForEntity("/api/payments/{paymentId}/fee", PaymentFeeModel.class, payment2Id);
+        resultFeeAsset = template.withBasicAuth(USERNAME, PASSWORD).getForEntity("/api/payments/{paymentId}/fee", PaymentFeeModel.class, payment2Id);
         Assertions.assertEquals(HttpStatus.OK, resultFeeAsset.getStatusCode());
         paymentFee = resultFeeAsset.getBody();
+        Assertions.assertNotNull(paymentFee);
 		Assertions.assertEquals(payment2Id, paymentFee.getId());
 		Assertions.assertNotNull(paymentFee.getFee());
 		
-        ResponseEntity<PaymentModel[]> resultList = template.withBasicAuth(username, password).getForEntity("/api/payments", PaymentModel[].class);
-        Assertions.assertEquals(HttpStatus.OK, resultList.getStatusCode());
-        Assertions.assertTrue(resultList.getBody().length > 0);
+        ResponseEntity<PaymentModel[]> resultListAsset = template.withBasicAuth(USERNAME, PASSWORD).getForEntity("/api/payments", PaymentModel[].class);
+        Assertions.assertEquals(HttpStatus.OK, resultListAsset.getStatusCode());
+        PaymentModel[] result = resultListAsset.getBody();
+        Assertions.assertNotNull(result);
+		Assertions.assertTrue(result.length > 0);
 
-        resultList = template.withBasicAuth(username, password).getForEntity("/api/payments/filter/lessThanAmount?currency=USD&amount=250", PaymentModel[].class);
-        Assertions.assertEquals(HttpStatus.OK, resultList.getStatusCode());
-        Assertions.assertTrue(resultList.getBody().length > 0);
+		resultListAsset = template.withBasicAuth(USERNAME, PASSWORD).getForEntity("/api/payments/filter/lessThanAmount?currency=USD&amount=250", PaymentModel[].class);
+        Assertions.assertEquals(HttpStatus.OK, resultListAsset.getStatusCode());
+        result = resultListAsset.getBody();
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.length > 0);
 	}
 
     private HttpEntity<Object> getHttpEntity(Object body, MultiValueMap<String, String> headerMap)
     {
         final HttpHeaders headers = new HttpHeaders(headerMap);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<Object>(body, headers);
+        return new HttpEntity<>(body, headers);
     }
 }

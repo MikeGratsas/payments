@@ -1,5 +1,6 @@
 package lt.luminor.payments.form;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -7,8 +8,13 @@ import javax.validation.constraints.*;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class PaymentModel {
+public class PaymentModel implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2638836202961216653L;
+	
 	private Long id;
     @NotBlank(message = "{payment.paymentType.required}")
     private String paymentType;
