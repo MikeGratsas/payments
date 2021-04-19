@@ -11,8 +11,11 @@ on:
       types: [opened, synchronize, reopened]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+    environment:
+      name: build
+      url: ${{ steps.create_release.outputs.html_url }}
 
     steps:
     - uses: actions/checkout@v2
@@ -47,6 +50,12 @@ jobs:
     - name: Build with Maven
       run: mvn clean install -DskipTests
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+        name: release
+    steps:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
