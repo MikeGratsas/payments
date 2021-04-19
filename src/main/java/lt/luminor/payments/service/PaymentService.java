@@ -142,7 +142,7 @@ public class PaymentService {
         paymentEntity.setCreditorBic(creditorBic);
     	Set<Currency> currencies = paymentTypeEntity.getCurrencies();
     	if (currencyEntity == null || !currencies.contains(currencyEntity))
-			throw new InvalidCurrencyException(paymentModel.getCurrency(), paymentModel.getPaymentType());
+        	throw new InvalidCurrencyException(paymentModel.getCurrency(), paymentModel.getPaymentType());
         paymentEntity.setCurrency(currencyEntity);
     	paymentEntity.setPaymentType(paymentTypeEntity);
         Optional<PaymentStatus> paymentStatusOptional = paymentStatusRepository.findById(1L);

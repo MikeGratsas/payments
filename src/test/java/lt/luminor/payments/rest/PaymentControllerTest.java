@@ -41,7 +41,7 @@ class PaymentControllerTest {
 	}
 
 	@Test
-	public void test() {
+	void test() {
         HttpEntity<Object> payment1Entity = getHttpEntity("{\"paymentType\": \"TYPE1\", \"currency\": \"EUR\", \"amount\": 50.15, \"debtorIban\": \"LT123456789\", \"creditorIban\": \"LT123456780\", \"details\": \"TYPE1 payment\" }", headerMap);
         ResponseEntity<PaymentModel> resultAsset = template.withBasicAuth(USERNAME, PASSWORD).postForEntity("/api/payments", payment1Entity, PaymentModel.class);
         Assertions.assertEquals(HttpStatus.CREATED, resultAsset.getStatusCode());

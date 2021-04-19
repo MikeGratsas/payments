@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: build
-      url: ${{ steps.create_release.outputs.html_url }}
 
     steps:
     - uses: actions/checkout@v2
