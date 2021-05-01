@@ -40,6 +40,12 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2      
 
+    - name: Prepare Code Coverage agent
+      run: mvn -B verify org.jacoco:jacoco-maven-plugin:prepare-agent
+      
+    - name: Produce Code Coverage report
+      run: mvn -B verify org.jacoco:jacoco-maven-plugin:report
+      
     - name: Analyze with SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
