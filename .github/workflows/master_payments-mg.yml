@@ -47,6 +47,9 @@ jobs:
         SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
         SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
         SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+        SPRING_SUPPORT_EMAIL: ${{ secrets.SPRING_SUPPORT_EMAIL }}
+        SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME }}
+        SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.java.coveragePlugin=jacoco -Dsonar.jacoco.reportPaths='${{ github.workspace }}/target/jacoco.exec' -Dsonar.coverage.jacoco.xmlReportPaths='${{ github.workspace }}/target/site/jacoco/jacoco.xml' -Dsonar.verbose=true
 
     - name: Build with Maven
