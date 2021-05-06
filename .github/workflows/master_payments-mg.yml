@@ -41,10 +41,10 @@ jobs:
         restore-keys: ${{ runner.os }}-m2      
 
     - name: Prepare Code Coverage agent
-      run: mvn -B verify org.jacoco:jacoco-maven-plugin:prepare-agent -DskipTests
+      run: mvn -B verify org.jacoco:jacoco-maven-plugin:prepare-agent -DskipTests -debug
       
     - name: Produce Code Coverage report
-      run: mvn -B verify org.jacoco:jacoco-maven-plugin:report -DskipTests
+      run: mvn -B verify org.jacoco:jacoco-maven-plugin:report -DskipTests -debug
       
     - name: Analyze with SonarCloud
       env:
