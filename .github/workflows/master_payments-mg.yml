@@ -53,13 +53,13 @@ jobs:
       run: mvn org.jacoco:jacoco-maven-plugin:prepare-agent test org.jacoco:jacoco-maven-plugin:report verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.java.coveragePlugin=jacoco -Dsonar.jacoco.reportPaths='${{ github.workspace }}/target/jacoco.exec' -Dsonar.coverage.jacoco.xmlReportPaths='${{ github.workspace }}/target/site/jacoco/jacoco.xml' -Dsonar.verbose=true
 
     - name: Build with Maven
-      run: mvn clean install -DskipTests
+      run: mvn clean package -DskipTests
       
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2
       with:
         name: package
-        path: '${{ github.workspace }}/target/*.jar'
+        path: '${{ github.workspace }}/target/*.war'
 
   deploy:
     needs: build
@@ -79,4 +79,4 @@ jobs:
         app-name: 'payments-mg'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_27fdeef5e453441f8746fbf0c59e9692 }}
-        package: '${{ github.workspace }}/target/*.jar'
+        package: '${{ github.workspace }}/target/*.war'
