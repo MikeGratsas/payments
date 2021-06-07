@@ -1,0 +1,36 @@
+name: Build and Deploy to GAE
+
+on:
+  release:
+    types: [created]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Setup gcloud CLI
+    - name: Setup
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - run: |-
+        gcloud info
+
+    # Deploy the application to the GAE
+    - name: Deploy
+      uses: google-github-actions/deploy-appengine@main
+      with:
+        project_id: ${{ env.PROJECT_ID }}
