@@ -1,11 +1,9 @@
 name: Build and Deploy to GAE
 
 on:
-  release:
-    types: [created]
-
-env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  push:
+    branches:
+      - master
 
 jobs:
   setup-build-publish-deploy:
@@ -33,4 +31,4 @@ jobs:
     - name: Deploy
       uses: google-github-actions/deploy-appengine@main
       with:
-        project_id: ${{ env.PROJECT_ID }}
+        project_id: ${{ secrets.GCP_PROJECT }}
