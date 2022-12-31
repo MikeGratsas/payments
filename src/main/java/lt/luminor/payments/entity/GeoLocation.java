@@ -1,6 +1,6 @@
 package lt.luminor.payments.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class GeoLocation extends Auditable<Long> {

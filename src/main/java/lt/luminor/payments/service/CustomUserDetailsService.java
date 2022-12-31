@@ -12,7 +12,7 @@ import lt.luminor.payments.config.CustomUserDetails;
 import lt.luminor.payments.entity.Client;
 import lt.luminor.payments.repository.ClientRepository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashSet;

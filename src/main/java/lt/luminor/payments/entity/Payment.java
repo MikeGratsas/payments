@@ -2,8 +2,8 @@ package lt.luminor.payments.entity;
 
 import java.math.BigDecimal;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 public class Payment extends Auditable<Long> {
