@@ -58,7 +58,7 @@ jobs:
       run: mvn -P tomcat clean package -DskipTests
       
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: package
         path: '${{ github.workspace }}/target/*.war'
@@ -70,7 +70,7 @@ jobs:
         name: release
     steps:
     - name: Download a Build Artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: package
         path: '${{ github.workspace }}/target'
