@@ -29,14 +29,14 @@ jobs:
         cache: 'maven'
 
     - name: Cache SonarCloud packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
 
     - name: Cache the Maven packages to speed up build
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -58,7 +58,7 @@ jobs:
       run: mvn -P tomcat clean package -DskipTests
       
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: package
         path: '${{ github.workspace }}/target/*.war'
@@ -70,7 +70,7 @@ jobs:
         name: release
     steps:
     - name: Download a Build Artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: package
         path: '${{ github.workspace }}/target'
