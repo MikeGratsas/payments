@@ -6,10 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +18,7 @@ import lt.luminor.payments.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled=true, jsr250Enabled = true)
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -40,30 +39,24 @@ public class SecurityConfig {
 */
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/*", "/payments/**", "/all/**").permitAll()
-                .requestMatchers("/admin/**", "/system/**").hasRole("ADMIN")
-                .requestMatchers("/manager/**").hasRole("MANAGER")
-                .requestMatchers("/user/**", "/api/**").hasRole("USER")
-                .anyRequest().authenticated()
-                .and()
-                /*
-                .formLogin()
-                .loginPage("/login").permitAll()
-                .and()
-                .logout()
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .logoutUrl("/logout")
-                .permitAll()
-                .and()
-                */
-                .httpBasic();
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/*", "/payments/**", "/all/**").permitAll()
+						.requestMatchers("/admin/**", "/system/**").hasRole("ADMIN")
+						.requestMatchers("/manager/**")
+						.hasRole("MANAGER").requestMatchers("/user/**", "/api/**").hasRole("USER")
+						.anyRequest()
+						.authenticated())
+				/*
+				.formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
+				.logout(logout -> logout.invalidateHttpSession(true)
+						.deleteCookies("JSESSIONID")
+						.logoutUrl("/logout").permitAll())
+				*/
+				.httpBasic(Customizer.withDefaults());
 
-        return http.build();
-    }
+		return http.build();
+	}
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

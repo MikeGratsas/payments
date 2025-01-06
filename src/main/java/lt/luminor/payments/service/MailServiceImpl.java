@@ -50,7 +50,7 @@ public class MailServiceImpl implements MailService {
 	    	HttpEntity<String> request = new HttpEntity<>(messagesJsonObject.toString(), headers);
 			final RestTemplate template = new RestTemplate();
 	    	ResponseEntity<String> response = template.postForEntity("https://api.mailjet.com/v3.1/send", request, String.class);
-	    	result = response.getStatusCodeValue();
+	    	result = response.getStatusCode().value();
 	    	if (response.hasBody())
 	    		LOGGER.info(response.getBody());
 		}
